@@ -1,14 +1,21 @@
 #!/bin/sh
 #
-### Script to determine the state of an audited Drupal website
+### Script to determine the state of an audited Drupal website.
 #
-### Prerequisites: Unix operating system, drush command tool
-### This script should be at Drupal's root directory
+### Prerequisites: Unix operating system, eventually drush command tool.
+### This script should be at Drupal website's root directory.
 #
 DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
-
-echo "Start Audit report" > drupal_audit_report.txt
-
+#
+### Prerequisite installation
+#
+if ! type "drush" > /dev/null; then
+  git clone git://git.drupal.org/project/drush --branch 7.x-5.x drush
+  export PATH="$(pwd)/drush:$PATH"
+fi
+#
+### Report generation
+#
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  Drush status" >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
@@ -63,11 +70,8 @@ echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  Caches status" >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
 drush dl -y cacheaudit
-drush en -y cacheaudit
 drush cc drush
 drush cacheaudit >> drupal_audit_report.txt
-drush dis -y cacheaudit
-drush pm-uninstall -y cacheaudit
 
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  PHP status" >> drupal_audit_report.txt
