@@ -5,7 +5,7 @@
 ### Prerequisites: Unix operating system, drush command tool
 ### This script should be at Drupal's root directory
 #
-DRUPAL_VERSION = `drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
+DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
 
 echo "Start Audit report" > drupal_audit_report.txt
 
