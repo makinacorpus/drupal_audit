@@ -35,6 +35,21 @@ echo "----------------------------------------" >> drupal_audit_report.txt
 echo "Module status" >> drupal_audit_report.txt
 drush pml >> drupal_audit_report.txt
 
+echo "----------------------------------------" >> drupal_audit_report.txt
+echo "Themes status" >> drupal_audit_report.txt
+for i in `drush pml | grep Theme | grep Enabled | cut -d\( -f2 | cut -d\) -f1`
+do
+  THEMENAME=$i
+  THEMEPATH=`drush php-eval "echo drupal_get_path('theme', '$i');"`
+  echo "# Theme: $THEMENAME" >> drupal_audit_report.txt
+  COUNT=`find $THEMEPATH -name *.tpl.php | wc -l`
+  echo "Templates count: $COUNT" >> drupal_audit_report.txt
+  COUNT=`grep -r function $THEMEPATH | wc -l`
+  echo "Functions count: $COUNT" >> drupal_audit_report.txt
+  COUNT=`grep -r db_[a-z_]*\( $THEMEPATH | wc -l`
+  echo "Database access count: $COUNT" >> drupal_audit_report.txt
+done
+
 #
 ### CAUTION: This step should only be performed on Drupal 7 websites.
 #
