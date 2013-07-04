@@ -5,8 +5,6 @@
 ### Prerequisites: Unix operating system, eventually drush command tool.
 ### This script should be at Drupal website's root directory.
 #
-DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
-DRUPAL_MAJOR_VERSION=`echo $DRUPAL_VERSION | cut -c1-1`
 
 #
 ### Prerequisite installation
@@ -15,6 +13,10 @@ if ! type "drush" > /dev/null; then
   git clone git://git.drupal.org/project/drush --branch 7.x-5.x drush
   export PATH="$(pwd)/drush:$PATH"
 fi
+
+DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
+DRUPAL_MAJOR_VERSION=`echo $DRUPAL_VERSION | cut -c1-1`
+
 #
 ### Report generation
 #
