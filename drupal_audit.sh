@@ -49,6 +49,21 @@ find profiles/ -name '*make*' -exec cat '{}' \; >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  Modules status" >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | wc -l`
+echo "Enabled total: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-dev" | wc -l`
+echo "Enabled dev: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-alpha" | wc -l`
+echo "Enabled alpha: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-beta" | wc -l`
+echo "Enabled beta: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-rc" | wc -l`
+echo "Enabled rc: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Disabled" | wc -l`
+echo "Disabled: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Not installed" | wc -l`
+echo "Not installed: $COUNT" >> drupal_audit_report.txt
+echo "--- --- --- --- ---" >> drupal_audit_report.txt
 drush pml >> drupal_audit_report.txt
 
 echo "----------------------------------------" >> drupal_audit_report.txt
