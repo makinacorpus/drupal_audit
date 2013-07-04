@@ -6,6 +6,8 @@
 ### This script should be at Drupal website's root directory.
 #
 DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
+DRUPAL_MAJOR_VERSION=`echo $DRUPAL_VERSION | cut -c1-1`
+
 #
 ### Prerequisite installation
 #
@@ -64,14 +66,18 @@ do
 done
 
 #
-### CAUTION: This step should only be performed on Drupal 7 websites.
+### This step should only be performed on Drupal 7 websites.
 #
-echo "----------------------------------------" >> drupal_audit_report.txt
-echo "  Caches status" >> drupal_audit_report.txt
-echo "----------------------------------------" >> drupal_audit_report.txt
-drush dl -y cacheaudit
-drush cc drush
-drush cacheaudit >> drupal_audit_report.txt
+if [ "7" = $DRUPAL_MAJOR_VERSION ]; then
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  echo "Caches status" >> drupal_audit_report.txt
+  drush dl -y cacheaudit
+  drush en -y cacheaudit
+  drush cc drush
+  drush cacheaudit >> drupal_audit_report.txt
+  drush dis -y cacheaudit
+  drush pm-uninstall -y cacheaudit
+fi
 
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  PHP status" >> drupal_audit_report.txt
