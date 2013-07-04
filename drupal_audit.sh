@@ -5,8 +5,6 @@
 ### Prerequisites: Unix operating system, eventually drush command tool.
 ### This script should be at Drupal website's root directory.
 #
-DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
-DRUPAL_MAJOR_VERSION=`echo $DRUPAL_VERSION | cut -c1-1`
 
 #
 ### Prerequisite installation
@@ -15,6 +13,10 @@ if ! type "drush" > /dev/null; then
   git clone git://git.drupal.org/project/drush --branch 7.x-5.x drush
   export PATH="$(pwd)/drush:$PATH"
 fi
+
+DRUPAL_VERSION=`drush status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//`
+DRUPAL_MAJOR_VERSION=`echo $DRUPAL_VERSION | cut -c1-1`
+
 #
 ### Report generation
 #
@@ -47,6 +49,21 @@ find profiles/ -name '*make*' -exec cat '{}' \; >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  Modules status" >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | wc -l`
+echo "Enabled total: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-dev" | wc -l`
+echo "Enabled dev: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-alpha" | wc -l`
+echo "Enabled alpha: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-beta" | wc -l`
+echo "Enabled beta: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Enabled" | grep "-rc" | wc -l`
+echo "Enabled rc: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Disabled" | wc -l`
+echo "Disabled: $COUNT" >> drupal_audit_report.txt
+COUNT=`drush pml | grep "Core" -v | grep "Not installed" | wc -l`
+echo "Not installed: $COUNT" >> drupal_audit_report.txt
+echo "--- --- --- --- ---" >> drupal_audit_report.txt
 drush pml >> drupal_audit_report.txt
 
 echo "----------------------------------------" >> drupal_audit_report.txt
