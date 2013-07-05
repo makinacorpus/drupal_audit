@@ -73,11 +73,8 @@ if [ "7" = $DRUPAL_MAJOR_VERSION ]; then
   echo "Caches status" >> drupal_audit_report.txt
   echo "----------------------------------------" >> drupal_audit_report.txt
   drush dl -y cacheaudit
-  drush en -y cacheaudit
   drush cc drush
   drush cacheaudit >> drupal_audit_report.txt
-  drush dis -y cacheaudit
-  drush pm-uninstall -y cacheaudit
 fi
 
 echo "----------------------------------------" >> drupal_audit_report.txt
