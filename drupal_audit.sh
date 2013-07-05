@@ -100,6 +100,14 @@ if [ "mysql" = $DB_VENDOR ] || [ "mysqli" = $DB_VENDOR ]; then
   drush sqlq "SHOW TABLE STATUS WHERE Data_free > 0;"  >> drupal_audit_report.txt
 fi
 
+if [ "pgsql" = $DB_VENDOR ]; then
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  echo "  PgSQL informations" >> drupal_audit_report.txt
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  drush sqlq "SELECT table_name as \"Name\", pg_total_relation_size(table_name) AS \"Data_length\" FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;" >> drupal_audit_report.txt
+
+fi
+
 # Missing in the script (to do manually):
 # Browser visit with WAppalyser and YSlow extensions
 # curl -I homepage (give some informations about proxys, ...)
