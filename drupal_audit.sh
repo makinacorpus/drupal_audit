@@ -45,6 +45,9 @@ find profiles/ -name '*make*' -exec cat '{}' \; >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  Modules status" >> drupal_audit_report.txt
 echo "----------------------------------------" >> drupal_audit_report.txt
+COUNT=`drush pml | grep -v "Core" | grep "Module" | grep "Enabled" | wc -l`
+echo "  Total enabled modules: $COUNT" >> drupal_audit_report.txt
+echo "----------------------------------------" >> drupal_audit_report.txt
 drush pml >> drupal_audit_report.txt
 
 echo "----------------------------------------" >> drupal_audit_report.txt
