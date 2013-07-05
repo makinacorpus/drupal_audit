@@ -71,6 +71,7 @@ done
 if [ "7" = $DRUPAL_MAJOR_VERSION ]; then
   echo "----------------------------------------" >> drupal_audit_report.txt
   echo "Caches status" >> drupal_audit_report.txt
+  echo "----------------------------------------" >> drupal_audit_report.txt
   drush dl -y cacheaudit
   drush en -y cacheaudit
   drush cc drush
@@ -89,7 +90,7 @@ drush php-eval 'phpinfo(INFO_GENERAL | INFO_CONFIGURATION | INFO_MODULES | INFO_
 #
 DB_VENDOR=`drush status | grep 'Database driver' | cut -d: -f2 | sed -e s/[^0-9]//`
 DB_NAME=`drush status | grep 'Database name' | cut -d: -f2 | sed -e s/[^0-9]//`
-if [ "mysql" = $DB_VENDOR ]; then
+if [ "mysql" = $DB_VENDOR ] || [ "mysqli" = $DB_VENDOR ]; then
   echo "----------------------------------------" >> drupal_audit_report.txt
   echo "  MySQL informations" >> drupal_audit_report.txt
   echo "----------------------------------------" >> drupal_audit_report.txt
