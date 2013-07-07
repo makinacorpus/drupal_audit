@@ -92,11 +92,11 @@ if [ "mysql" = $DB_VENDOR ] || [ "mysqli" = $DB_VENDOR ]; then
   echo "----------------------------------------" >> drupal_audit_report.txt
   echo "  MySQL informations" >> drupal_audit_report.txt
   echo "----------------------------------------" >> drupal_audit_report.txt
-  drush sqlq "SELECT CONCAT(SUM(ROUND(data_length/(1024*1024),2)),'Mb') AS data_length, CONCAT(SUM(ROUND(index_length/(1024*1024),2)),'Mb') AS index_length FROM information_schema.TABLES WHERE table_schema = \"$DB_NAME\" GROUP BY table_schema;" >> drupal_audit_report.txt
+  drush sqlq "SELECT CONCAT(SUM(ROUND(data_length/(1024*1024),2)),'Mb') AS data_length, CONCAT(SUM(ROUND(index_length/(1024*1024),2)),'Mb') AS index_length FROM information_schema.TABLES WHERE table_schema = \"`echo $DB_NAME`\" GROUP BY table_schema;" >> drupal_audit_report.txt
   echo "Tables that are not using utf8_general_ci:" >> drupal_audit_report.txt
-  drush sqlq "SELECT TABLE_NAME AS name, TABLE_COLLATION AS collation FROM information_schema.TABLES WHERE TABLES.table_schema = \"$DB_NAME\" AND TABLE_COLLATION != 'utf8_general_ci';" >> drupal_audit_report.txt
+  drush sqlq "SELECT TABLE_NAME AS name, TABLE_COLLATION AS collation FROM information_schema.TABLES WHERE TABLES.table_schema = \"`echo $DB_NAME`\" AND TABLE_COLLATION != 'utf8_general_ci';" >> drupal_audit_report.txt
   echo "Tables with more than 1 000 rows:" >> drupal_audit_report.txt
-  drush sqlq "SELECT TABLE_NAME AS table_name, TABLE_ROWS AS rows FROM information_schema.TABLES WHERE TABLES.TABLE_SCHEMA = \"$DB_NAME\" AND TABLE_ROWS >= 1000 ORDER BY TABLE_ROWS desc;" >> drupal_audit_report.txt
+  drush sqlq "SELECT TABLE_NAME AS table_name, TABLE_ROWS AS rows FROM information_schema.TABLES WHERE TABLES.TABLE_SCHEMA = \"`echo $DB_NAME`\" AND TABLE_ROWS >= 1000 ORDER BY TABLE_ROWS desc;" >> drupal_audit_report.txt
   echo "DB Fragmentation:" >> drupal_audit_report.txt
   drush sqlq "SHOW TABLE STATUS WHERE Data_free > 0;"  >> drupal_audit_report.txt
 fi
