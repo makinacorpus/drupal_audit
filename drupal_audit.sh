@@ -83,12 +83,34 @@ done
 #
 if [ 7 = "$DRUPAL_MAJOR_VERSION" ]; then
   echo "----------------------------------------" >> drupal_audit_report.txt
-  echo "Caches status" >> drupal_audit_report.txt
+  echo "  Caches status" >> drupal_audit_report.txt
   echo "----------------------------------------" >> drupal_audit_report.txt
   drush $SITE_ALIAS dl -y cacheaudit
   drush $SITE_ALIAS cc drush
   drush $SITE_ALIAS cacheaudit >> drupal_audit_report.txt
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  echo "  Data information" >> drupal_audit_report.txt
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT t.name AS \"Node type\", COUNT(n.nid) AS Count FROM node_type t LEFT OUTER JOIN node n ON t.type = n.type GROUP BY t.name;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT v.name AS \"Vocabulary name\", COUNT(t.tid) AS Count FROM taxonomy_vocabulary v LEFT OUTER JOIN taxonomy_term_data t ON v.vid = t.vid GROUP BY v.name;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT r.name AS \"Role name\", COUNT(u.uid) AS Count FROM role r LEFT OUTER JOIN users_roles u ON r.rid = u.rid GROUP BY r.rid;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT ci.entity_type AS Entity, ci.bundle AS Bundle, c.field_name AS Field, c.type AS Type, c.module AS Module, c.cardinality AS Cardinality FROM field_config_instance ci INNER JOIN field_config c ON ci.field_id = c.id WHERE c.active = 1 ORDER BY ci.entity_type, ci.bundle, c.id;" >> drupal_audit_report.txt
 fi
+
+if [ 6 = "$DRUPAL_MAJOR_VERSION" ]; then
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  echo "  Data information" >> drupal_audit_report.txt
+  echo "----------------------------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT t.name AS \"Node type\", COUNT(n.nid) AS Count FROM node_type t LEFT OUTER JOIN node n ON t.type = n.type GROUP BY t.name;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT v.name AS \"Vocabulary name\", COUNT(t.tid) AS Count FROM vocabulary v LEFT OUTER JOIN term_data t ON v.vid = t.vid GROUP BY v.name;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT r.name AS \"Role name\", COUNT(u.uid) AS Count FROM role r LEFT OUTER JOIN users_roles u ON r.rid = u.rid GROUP BY r.rid;" >> drupal_audit_report.txt
+fi
+
 
 echo "----------------------------------------" >> drupal_audit_report.txt
 echo "  PHP status" >> drupal_audit_report.txt
@@ -104,13 +126,16 @@ if [ "mysql" = $DB_VENDOR ] || [ "mysqli" = $DB_VENDOR ]; then
   echo "----------------------------------------" >> drupal_audit_report.txt
   echo "  MySQL informations" >> drupal_audit_report.txt
   echo "----------------------------------------" >> drupal_audit_report.txt
-  drush $SITE_ALIAS sqlq "SELECT CONCAT(SUM(ROUND(data_length/(1024*1024),2)),'Mb') AS data_length, CONCAT(SUM(ROUND(index_length/(1024*1024),2)),'Mb') AS index_length FROM information_schema.TABLES WHERE table_schema = \"$DB_NAME\" GROUP BY table_schema;" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT CONCAT(SUM(ROUND(data_length/(1024*1024),2)),'Mb') AS data_length, CONCAT(SUM(ROUND(index_length/(1024*1024),2)),'Mb') AS index_length FROM information_schema.TABLES WHERE table_schema = \"`echo $DB_NAME`\" GROUP BY table_schema;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
   echo "Tables that are not using utf8_general_ci:" >> drupal_audit_report.txt
-  drush $SITE_ALIAS sqlq "SELECT TABLE_NAME AS name, TABLE_COLLATION AS collation FROM information_schema.TABLES WHERE TABLES.table_schema = \"$DB_NAME\" AND TABLE_COLLATION != 'utf8_general_ci';" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT TABLE_NAME AS name, TABLE_COLLATION AS collation FROM information_schema.TABLES WHERE TABLES.table_schema = \"`echo $DB_NAME`\" AND TABLE_COLLATION != 'utf8_general_ci';" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
   echo "Tables with more than 1 000 rows:" >> drupal_audit_report.txt
-  drush $SITE_ALIAS sqlq "SELECT TABLE_NAME AS table_name, TABLE_ROWS AS rows FROM information_schema.TABLES WHERE TABLES.TABLE_SCHEMA = \"$DB_NAME\" AND TABLE_ROWS >= 1000 ORDER BY TABLE_ROWS desc;" >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT TABLE_NAME AS table_name, TABLE_ROWS AS rows FROM information_schema.TABLES WHERE TABLES.TABLE_SCHEMA = \"`echo $DB_NAME`\" AND TABLE_ROWS >= 1000 ORDER BY TABLE_ROWS desc;" >> drupal_audit_report.txt
+  echo "--------------------" >> drupal_audit_report.txt
   echo "DB Fragmentation:" >> drupal_audit_report.txt
-  drush $SITE_ALIAS sqlq "SHOW TABLE STATUS WHERE Data_free > 0;"  >> drupal_audit_report.txt
+  drush $SITE_ALIAS sqlq "SELECT TABLE_NAME, ENGINE, TABLE_ROWS, DATA_FREE FROM information_schema.TABLES WHERE TABLES.TABLE_SCHEMA = \"`echo $DB_NAME`\" AND DATA_FREE > 0;" >> drupal_audit_report.txt
 fi
 
 if [ "pgsql" = $DB_VENDOR ]; then
@@ -120,6 +145,8 @@ if [ "pgsql" = $DB_VENDOR ]; then
   drush $SITE_ALIAS sqlq "SELECT table_name as \"Name\", pg_total_relation_size(table_name) AS \"Data_length\" FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;" >> drupal_audit_report.txt
 
 fi
+
+echo "----------------------------------------" >> drupal_audit_report.txt
 
 # Missing in the script (to do manually):
 # Browser visit with WAppalyser and YSlow extensions
