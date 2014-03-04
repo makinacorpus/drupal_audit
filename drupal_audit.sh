@@ -15,12 +15,12 @@ for var in "$@"; do
 done
 #
 ### Prerequisites: Unix operating system, eventually drush command tool.
-### This script should be at Drupal website's root directory.
+### This script should be launched from Drupal website's root directory.
 #
 ### Prerequisite installation
 #
 if ! type "drush" > /dev/null; then
-  git clone git://git.drupal.org/project/drush --branch 7.x-5.x drush
+  git clone https://github.com/drush-ops/drush.git --branch 6.x drush
   export PATH="$(pwd)/drush:$PATH"
 fi
 DRUPAL_VERSION=$(drush $SITE_ALIAS status | grep 'Drupal version' | cut -d: -f2 | sed -e s/[^0-9]//)
